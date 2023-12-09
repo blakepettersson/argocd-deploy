@@ -1,0 +1,154 @@
+argo-cd:
+  configs:
+    # General Argo CD configuration
+    ## Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cm.yaml
+    cm:
+      # -- Enable local admin user
+      ## Ref: https://argo-cd.readthedocs.io/en/latest/faq/#how-to-disable-admin-user
+      admin.enabled: true
+      # -- Timeout to discover if a new manifests version got published to the repository
+      timeout.reconciliation: 180s
+      # -- Timeout to refresh application data as well as target manifests cache
+      timeout.hard.reconciliation: 0s
+    # Argo CD configuration parameters
+    ## Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cmd-params-cm.yaml
+    params:
+      # -- Create the argocd-cmd-params-cm configmap
+      # If false, it is expected the configmap will be created by something else.
+      create: true
+      ## Controller Properties
+      # -- Number of application status processors
+      controller.status.processors: 20
+      # -- Number of application operation processors
+      controller.operation.processors: 10
+      # -- Specifies timeout between application self-heal attempts
+      controller.self.heal.timeout.seconds: 5
+      # -- Repo server RPC call timeout seconds.
+      controller.repo.server.timeout.seconds: 60
+
+      ## Server properties
+      # -- Run server without TLS
+      server.insecure: true # For local dev only!
+      # -- Enable GZIP compression
+      server.enable.gzip: true
+
+      ## Repo-server properties
+      # -- Limit on number of concurrent manifests generate requests. Any value less the 1 means no limit.
+      reposerver.parallelism.limit: 0
+
+      # -- Enables [Applications in any namespace]
+      ## List of additional namespaces where applications may be created in and reconciled from.
+      ## The namespace where Argo CD is installed to will always be allowed.
+      ## Set comma-separated list. (e.g. app-team-one, app-team-two)
+      application.namespaces: ""
+    clusterCredentials: []
+      # - name: mycluster
+      #   server: https://mycluster.example.com
+      #   labels: {}
+      #   annotations: {}
+      #   config:
+      #     bearerToken: "<authentication token>"
+      #     tlsClientConfig:
+      #       insecure: false
+      #       caData: "<base64 encoded certificate>"
+      # - name: mycluster2
+      #   server: https://mycluster2.example.com
+      #   labels: {}
+      #   annotations: {}
+      #   namespaces: namespace1,namespace2
+      #   clusterResources: true
+      #   config:
+      #     bearerToken: "<authentication token>"
+      #     tlsClientConfig:
+      #       insecure: false
+      #       caData: "<base64 encoded certificate>"
+      # - name: mycluster3-project-scoped
+      #   server: https://mycluster3.example.com
+      #   labels: {}
+      #   annotations: {}
+      #   project: my-project1
+      #   config:
+      #     bearerToken: "<authentication token>"
+      #     tlsClientConfig:
+      #       insecure: false
+    #       caData: "<base64 encoded certificate>"
+
+    # -- Repository credentials to be used as Templates for other repos
+    ## Creates a secret for each key/value specified below to create repository credentials
+    credentialTemplates: {}
+      # github-enterprise-creds-1:
+      #   url: https://github.com/argoproj
+      #   githubAppID: 1
+      #   githubAppInstallationID: 2
+      #   githubAppEnterpriseBaseUrl: https://ghe.example.com/api/v3
+      #   githubAppPrivateKey: |
+      #     -----BEGIN OPENSSH PRIVATE KEY-----
+      #     ...
+      #     -----END OPENSSH PRIVATE KEY-----
+      # https-creds:
+      #   url: https://github.com/argoproj
+      #   password: my-password
+      #   username: my-username
+      # ssh-creds:
+      #  url: git@github.com:argoproj-labs
+      #  sshPrivateKey: |
+      #    -----BEGIN OPENSSH PRIVATE KEY-----
+      #    ...
+    #    -----END OPENSSH PRIVATE KEY-----
+    # -- Repositories list to be used by applications
+    ## Creates a secret for each key/value specified below to create repositories
+    ## Note: the last example in the list would use a repository credential template, configured under "configs.credentialTemplates".
+    repositories: {}
+      # istio-helm-repo:
+      #   url: https://storage.googleapis.com/istio-prerelease/daily-build/master-latest-daily/charts
+      #   name: istio.io
+      #   type: helm
+      # private-helm-repo:
+      #   url: https://my-private-chart-repo.internal
+      #   name: private-repo
+      #   type: helm
+      #   password: my-password
+      #   username: my-username
+      # private-repo:
+    #   url: https://github.com/argoproj/private-repo
+    # Argo CD sensitive data
+    # Ref: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#sensitive-data-and-sso-client-secrets
+    secret:
+      # -- Create the argocd-secret
+      createSecret: true
+      # -- Bcrypt hashed admin password
+      # The password is "password" - DO NOT USE IN PRODUCTION!!
+      argocdServerAdminPassword: "$2a$10$RncPyHW/B5ll2Z3J8s.IBOnbZ9uoJ4JhHLKzj5lzG/kU1KN1Oj3/K" # for local dev only!
+  notifications:
+    resources: {}
+  applicationSet:
+    resources: {}
+  controller:
+    resources: {}
+  repoServer:
+    resources: {}
+    metrics:
+      enabled: true
+  server:
+    resources: {}
+    service:
+      type: NodePort
+argocd-apps:
+  applications:
+    - name: argocd-appsets
+      namespace: argocd
+      project: default
+      source:
+        repoURL: https://github.com/blakepettersson/argocd-appsets.git
+        targetRevision: main
+        path: .
+        #directory:
+          #recurse: true
+          #include: "{base-appsets**,projects**}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
