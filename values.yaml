@@ -75,47 +75,6 @@ argo-cd:
       #     tlsClientConfig:
       #       insecure: false
     #       caData: "<base64 encoded certificate>"
-
-    # -- Repository credentials to be used as Templates for other repos
-    ## Creates a secret for each key/value specified below to create repository credentials
-    credentialTemplates: {}
-      # github-enterprise-creds-1:
-      #   url: https://github.com/argoproj
-      #   githubAppID: 1
-      #   githubAppInstallationID: 2
-      #   githubAppEnterpriseBaseUrl: https://ghe.example.com/api/v3
-      #   githubAppPrivateKey: |
-      #     -----BEGIN OPENSSH PRIVATE KEY-----
-      #     ...
-      #     -----END OPENSSH PRIVATE KEY-----
-      # https-creds:
-      #   url: https://github.com/argoproj
-      #   password: my-password
-      #   username: my-username
-      # ssh-creds:
-      #  url: git@github.com:argoproj-labs
-      #  sshPrivateKey: |
-      #    -----BEGIN OPENSSH PRIVATE KEY-----
-      #    ...
-    #    -----END OPENSSH PRIVATE KEY-----
-    # -- Repositories list to be used by applications
-    ## Creates a secret for each key/value specified below to create repositories
-    ## Note: the last example in the list would use a repository credential template, configured under "configs.credentialTemplates".
-    repositories: {}
-      # istio-helm-repo:
-      #   url: https://storage.googleapis.com/istio-prerelease/daily-build/master-latest-daily/charts
-      #   name: istio.io
-      #   type: helm
-      # private-helm-repo:
-      #   url: https://my-private-chart-repo.internal
-      #   name: private-repo
-      #   type: helm
-      #   password: my-password
-      #   username: my-username
-      # private-repo:
-    #   url: https://github.com/argoproj/private-repo
-    # Argo CD sensitive data
-    # Ref: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#sensitive-data-and-sso-client-secrets
     secret:
       # -- Create the argocd-secret
       createSecret: true
@@ -126,16 +85,30 @@ argo-cd:
     resources: {}
   applicationSet:
     resources: {}
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
   controller:
     resources: {}
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
   repoServer:
     resources: {}
     metrics:
       enabled: true
+      serviceMonitor:
+        enabled: true
   server:
     resources: {}
     service:
       type: NodePort
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
 argocd-apps:
   applications:
     - name: argocd-appsets
@@ -145,9 +118,6 @@ argocd-apps:
         repoURL: https://github.com/blakepettersson/argocd-appsets.git
         targetRevision: main
         path: .
-        #directory:
-          #recurse: true
-          #include: "{base-appsets**,projects**}"
       destination:
         server: https://kubernetes.default.svc
         namespace: argocd
