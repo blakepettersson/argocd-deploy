@@ -3,6 +3,9 @@ argo-cd:
     # General Argo CD configuration
     ## Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cm.yaml
     cm:
+      # -- The name of tracking label used by Argo CD for resource pruning
+      # @default -- Defaults to app.kubernetes.io/instance
+      application.instanceLabelKey: app.kubernetes.io/instance
       # -- Enable local admin user
       ## Ref: https://argo-cd.readthedocs.io/en/latest/faq/#how-to-disable-admin-user
       admin.enabled: true
