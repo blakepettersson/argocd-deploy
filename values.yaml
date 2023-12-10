@@ -3,9 +3,9 @@ argo-cd:
     # General Argo CD configuration
     ## Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cm.yaml
     cm:
-      # -- The name of tracking label used by Argo CD for resource pruning
-      # @default -- Defaults to app.kubernetes.io/instance
-      application.instanceLabelKey: app.kubernetes.io/instance
+      # -- Enable annotation tracking
+      ## Ref: https://argo-cd.readthedocs.io/en/stable/user-guide/resource_tracking/
+      application.resourceTrackingMethod: annotation+label
       # -- Enable local admin user
       ## Ref: https://argo-cd.readthedocs.io/en/latest/faq/#how-to-disable-admin-user
       admin.enabled: true
@@ -44,37 +44,6 @@ argo-cd:
       ## The namespace where Argo CD is installed to will always be allowed.
       ## Set comma-separated list. (e.g. app-team-one, app-team-two)
       application.namespaces: ""
-    clusterCredentials: []
-      # - name: mycluster
-      #   server: https://mycluster.example.com
-      #   labels: {}
-      #   annotations: {}
-      #   config:
-      #     bearerToken: "<authentication token>"
-      #     tlsClientConfig:
-      #       insecure: false
-      #       caData: "<base64 encoded certificate>"
-      # - name: mycluster2
-      #   server: https://mycluster2.example.com
-      #   labels: {}
-      #   annotations: {}
-      #   namespaces: namespace1,namespace2
-      #   clusterResources: true
-      #   config:
-      #     bearerToken: "<authentication token>"
-      #     tlsClientConfig:
-      #       insecure: false
-      #       caData: "<base64 encoded certificate>"
-      # - name: mycluster3-project-scoped
-      #   server: https://mycluster3.example.com
-      #   labels: {}
-      #   annotations: {}
-      #   project: my-project1
-      #   config:
-      #     bearerToken: "<authentication token>"
-      #     tlsClientConfig:
-      #       insecure: false
-    #       caData: "<base64 encoded certificate>"
     secret:
       # -- Create the argocd-secret
       createSecret: true
