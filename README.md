@@ -25,7 +25,7 @@ The initial setup is a one-liner, which will get the initial Argo CD up and runn
   helm template --namespace argocd --name-template=argocd . | kubectl apply -f -
 ```
 
-Once that has been setup, you will need to setup the repository credentials in order for Argo CD to be able to manage 
+Once that has been setup, you will need to configure the repository credentials in order for Argo CD to be able to manage 
 itself in the future, as well as setting up of Prometheus and Grafana. You will first need to get a Github PAT through
 some out-of-band means. Once you have gotten a PAT, you can then either set it up in the UI by logging in to 
 http://localhost:30080, head to `Settings/Repositories` and add a repo that way, or you can add it with the following 
@@ -36,10 +36,9 @@ argocd login localhost:30080 --insecure
 argocd repocreds add https://github.com/blakepettersson --username anything --password github_pat_<something>
 ```
 
-In order for [kube-prometheus-stack]() to be deployed, we need to add a cluster label to our local cluster. Once the label
-has been set, the applicationset-controller will pick it up and then generate an app in the local cluster. In order to
-do that we need to either do it in the UI by logging in to http://localhost:30080, then to `Settings/Clusters` and edit
-the cluster and adding a label with the key `environment` and the value `dev`. 
-
-As an alternative to the UI, you can imperatively add the label directly on the cluster secret using 
-`kubectl edit secret cluster-<clustername>`.
+In order for [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) 
+to be deployed, we need to add a cluster label to our local cluster. Once the label has been set, the 
+applicationset-controller will pick it up and then generate an app in the local cluster. In order to do that
+we need to either configure it in the UI by logging in to http://localhost:30080, then to `Settings/Clusters` and edit
+the cluster and adding a label with the key `environment` and the value `dev`, or alternatively, that can imperatively 
+be done by adding the label directly on the cluster secret using `kubectl edit secret cluster-<clustername>`.
