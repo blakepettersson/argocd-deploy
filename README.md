@@ -40,5 +40,9 @@ In order for [kube-prometheus-stack](https://github.com/prometheus-community/hel
 to be deployed, we need to add a cluster label to our local cluster. Once the label has been set, the 
 applicationset-controller will pick it up and then generate an app in the local cluster. In order to do that
 we need to either configure it in the UI by logging in to http://localhost:30080, then to `Settings/Clusters` and edit
-the cluster and adding a label with the key `environment` and the value `dev`, or alternatively, that can imperatively 
-be done by adding the label directly on the cluster secret using `kubectl edit secret cluster-<clustername>`.
+the cluster and adding a label with the key `environment` and the value `dev`.
+
+As far as I know, there's currently no way to set labels on the `in-cluster` cluster with the `argocd` CLI. Once the 
+`in-cluster` has been edited, you can do subsequent edits with `kubectl edit secret cluster-<clustername>` (since what
+happens with the first edit is that a cluster secret gets created with all the attributes of the pre-existing 
+`in-cluster`, but that does not initially exist).
