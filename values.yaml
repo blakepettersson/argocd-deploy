@@ -47,9 +47,6 @@ argo-cd:
     secret:
       # -- Create the argocd-secret
       createSecret: true
-      # -- Bcrypt hashed admin password
-      # The password is "password" - DO NOT USE IN PRODUCTION!!
-      argocdServerAdminPassword: "$2a$10$RncPyHW/B5ll2Z3J8s.IBOnbZ9uoJ4JhHLKzj5lzG/kU1KN1Oj3/K" # for local dev only!
   notifications:
     resources: {}
   applicationSet:

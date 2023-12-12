@@ -25,15 +25,36 @@ The initial setup is a one-liner, which will get the initial Argo CD up and runn
   helm template --namespace argocd --name-template=argocd . | kubectl apply -f -
 ```
 
-Once that has been setup, you will need to configure the repository credentials in order for Argo CD to be able to manage 
-itself in the future, as well as setting up of Prometheus and Grafana. You will first need to get a Github PAT through
-some out-of-band means. Once you have gotten a PAT, you can then either set it up in the UI by logging in to 
+Once everything has been deployed, you can then retrieve the initial admin password with the following command:
+
+```shell
+argocd admin initial-password
+```
+
+Reset the initial password.
+
+```shell
+argocd login localhost:30080 --insecure
+argocd account update-password
+# login again with your new password
+argocd login localhost:30080 --insecure
+```
+
+You will then need to configure the repository credentials in order for Argo CD to be able to manage itself in the future, 
+as well as enabling the setup up of Prometheus and Grafana. You will first need to get a GitHub PAT through some 
+out-of-band means. Once you have gotten a PAT, you can then either set it up in the UI by logging in to 
 http://localhost:30080, head to `Settings/Repositories` and add a repo that way, or you can add it with the following 
 commands below:
 
 ```shell
-argocd login localhost:30080 --insecure    
+argocd login localhost:30080 --insecure # username: admin password: your password
 argocd repocreds add https://github.com/blakepettersson --username anything --password github_pat_<something>
+```
+
+You might need to refresh the application, in order for it to pick up the credential changes (this applies for the UI as well).
+
+```shell
+argocd app get argocd/argocd-appsets --refresh
 ```
 
 In order for [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) 
